@@ -12,5 +12,12 @@ import theano.tensor as T
 import lasagne
 
 
-LEARNING_RATE = .001
-NUM_EPOCHS = .001
+'''
+how to implement maxout layer:
+
+l1a = lasagne.layers.DenseLayer(l_in, nonlinearity=None, num_units=512, ...)
+l1 = lasagne.layers.FeaturePoolLayer(l1a, ds=2)
+
+not sure how many units to use or what to connect this to
+
+'''
