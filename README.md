@@ -7,21 +7,14 @@ Jointly Learning to Align and Translate" by D. Bahdanau, K. Cho, and Y. Bengio.
 Implemented in Python using [Theano](https://github.com/Theano/Theano) and
 [Lasagne](https://github.com/Lasagne/Lasagne).
 
-
-## Model
-
-RNN encoder-decoder with soft attention mechanism.
-[...]
-<!---
-Insert clear explanation of model along with diagrams 
--->
+<!--- ////////////////// -->
 
 ## Usage
 
 ###Translation
 [...]
 
-#####Using precomputed weights
+####Using precomputed weights
 [...]
 
 
@@ -50,3 +43,15 @@ perl tools/normalize-punctuation.perl [en/fr] < data.[en/fr]
 
 ####Train the model
 [...]
+
+
+<!--- ////////////////// -->
+
+## Model
+
+RNN encoder-decoder with soft attention mechanism.
+[...]
+<!---
+Insert clear explanation of model along with diagrams 
+-->
+

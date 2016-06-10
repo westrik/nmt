@@ -4,12 +4,20 @@ Encoder-decoder architecture
 for statistical machine translation
 '''
 
+# have a model that can be trained
+# encoder:
+# decoder:
+
 from __future__ import print_function
 
 import numpy as np
 import theano
 import theano.tensor as T
 import lasagne
+
+
+class RNNEncDecAttnModel:
+    pass
 
 
 '''
