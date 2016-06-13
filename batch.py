@@ -4,11 +4,15 @@ Prepare data
 '''
 
 import string
+import numpy as np
+
+MAX_SENTENCE_LEN = 30
+VOCAB_SIZE = 30000
 
 class CorpusPair:
     '''
     After initialization, contains a dictionary of most frequently 
-    occuring 30k words. Then, batches can be generated.
+    occuring VOCAB_SIZE words. Then, batches can be generated.
     '''
 
     words_src = None
@@ -31,9 +35,6 @@ class CorpusPair:
         self.count_word_usage()
         self.vectorize_corpora()
 
-        print self.words_src[0]
-        print self.words_src[1]
-
 
     def count_word_usage(self):
         '''
@@ -41,6 +42,7 @@ class CorpusPair:
         '''
 
         def build_count_dict(x):
+            # Count frequencies of all words
             words = string.join(x).split(' ')
             freqs = {}
             for w in words:
@@ -49,19 +51,24 @@ class CorpusPair:
                 else:
                     freqs[w] = 1
 
+            # Sort words by frequency
             aux = [(freqs[key], key) for key in freqs]
             aux.sort()
             aux.reverse()
-            aux = [w[1] for w in aux][:30000]
+            aux = [w[1] for w in aux][:VOCAB_SIZE-1]
 
+            # Build bidirectional dictionary to store word mappings
             idx2w = {}
             w2idx = {}
-
             for idx, w in enumerate(aux):
-                idx2w[idx] = w
-                w2idx[w] = idx
+                idx2w[idx+1] = w
+                w2idx[w] = idx+1
 
-            return (idx2w,w2idx)
+            # Store mapping for unknown words
+            idx2w[0] = "[UNK]"
+            w2idx["[UNK]"] = 0
+
+            return (idx2w, w2idx)
 
         # Create list of top words
         # self.words_xxx[0] = index to word map
@@ -69,13 +76,40 @@ class CorpusPair:
         self.words_src = build_count_dict(self.source)
         self.words_dst = build_count_dict(self.dst)
 
+
     def vectorize_corpora(self):
         '''
         Convert sentence pairs into vector representations
         '''
 
-        # make a numpy array 
-        pass
+        def words_in_s(s): return len(s.split())
+
+        # Count sentences that fit within length limit
+        num_sentences = 0
+        for idx,line in enumerate(self.source):
+            if words_in_s(self.source[idx]) <= MAX_SENTENCE_LEN \
+                    and words_in_s(self.dst[idx]) <= MAX_SENTENCE_LEN:
+                num_sentences += 1
+
+        # Initialize numpy matrices to store sentences as vectors
+        sen_src = np.zeros(shape=(num_sentences,30,VOCAB_SIZE,))
+        sen_dst = np.zeros(shape=(num_sentences,30,VOCAB_SIZE,))
+
+        # Vectorize all sentences of valid length
+        def encode(idx, word, word_dict, sen_arr):
+            for idy, word in enumerate(line.split(' ')):
+                if word in word_dict[1]:
+                    sen_arr[idx,idy,word_dict[1][word]] = 1
+                else:
+                    sen_arr[idx,idy,0] = 1
+
+        for idx, line in enumerate(self.source):
+            if words_in_s(self.source[idx]) <= MAX_SENTENCE_LEN \
+                    and words_in_s(self.dst[idx]) <= MAX_SENTENCE_LEN:
+                for idw, word in enumerate(self.source[idx].split()):
+                    encode(idw, word, self.words_src, sen_src)
+                for idw, word in enumerate(self.dst[idx].split()):
+                    encode(idw, word, self.words_dst, sen_dst)
 
 
     def shuffle_and_split(self):
