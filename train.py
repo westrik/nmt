@@ -5,6 +5,7 @@ Train model
 
 from batch import CorpusPair
 from model import RNNEncDecAttnModel
+import pickle as pkl
 
 
 DEV_SRC = '../datasets/translation/dev-set/newstest-2012+2013.tok.en'
@@ -28,6 +29,8 @@ def main():
 #        model.train(x)
 
     # dump bidir word dicts 
+    with open('wordmap.pkl','w') as wordmap:
+        pkl.dump((cp.words_src, cp.words_dst), wordmap)
 
 
 
