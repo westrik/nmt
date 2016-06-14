@@ -16,8 +16,10 @@ class CorpusPair:
     occuring VOCAB_SIZE words. Then, batches can be generated.
     '''
 
+    current_offset = 0   # updated after batching
+    num_sentences = 0    # updated when word matrices are built
+
     def __init__(self, source, dst):
-        self.num_sentences = 0
 
         # open input files, store lines
         try:
@@ -33,9 +35,7 @@ class CorpusPair:
         self.build_dicts()
         self.vectorize_corpora()
 
-        for line in self.vec_src:
-            print(self.decode_src(line))
-        print(self.decode_dst(self.vec_dst[0]))
+        print len( self.get_minibatches())
 
 
     def shuffle(self):
@@ -162,6 +162,31 @@ class CorpusPair:
         '''
 
         def sentence_len(sentence):
-            pass
+            length = 0
+            for word in sentence:
+                if len(np.nonzero(word)[0]) == 1:
+                    length += 1
+                else:
+                    break
+            return length
 
-        idxs = random.sample(range(0, self.num_sentences), 1600)
+        # Select 1600 sentences
+        src_pairs = self.vec_src[self.current_offset:self.current_offset+1600]
+        dst_pairs = self.vec_dst[self.current_offset:self.current_offset+1600]
+        self.current_offset += 1600
+
+        if self.current_offset > self.num_sentences:
+            self.current_offset -= self.num_sentences
+
+        # Sort by sentence length
+        lengths = [sentence_len(sentence) for sentence in src_pairs]
+        z = list(zip(lengths, src_pairs, dst_pairs))
+        z = sorted(z, key=lambda x: x[0])
+        _, src_pairs, dst_pairs = zip(*z)
+
+        # Split into 20 minibatches
+        batches = []
+        for i in range(1,21):
+            batches.append((src_pairs[i*0:i*80], dst_pairs[i*0:i*80]))
+
+        return batches
