@@ -33,7 +33,7 @@ class CorpusPair:
         self.build_dicts()
         self.vectorize_corpora()
 
-        print(self.vec_src[0])
+        self.decode(self.vec_src[0])
 
 
     def shuffle(self):
@@ -106,21 +106,21 @@ class CorpusPair:
         self.vec_dst = np.zeros(shape=(self.num_sentences,30,VOCAB_SIZE,))
 
         # Vectorize all sentences of valid length
-        def encode(idx, word, word_dict, sen_arr):
-            for idy, word in enumerate(line.split(' ')):
-                if word in word_dict[1]:
-                    sen_arr[idx,idy,word_dict[1][word]] = 1
-                else:
-                    sen_arr[idx,idy,0] = 1
+        def encode(idx, idy, word, word_dict, sen_arr):
+            if word in word_dict[1]:
+                sen_arr[idx,idy,word_dict[1][word]] = 1
+            else:
+                sen_arr[idx,idy,0] = 1
 
-        for idx, line in enumerate(self.source):
+        idx = 0
+        for line in enumerate(self.source):
             if words_in_s(self.source[idx]) <= MAX_SENTENCE_LEN \
                     and words_in_s(self.dst[idx]) <= MAX_SENTENCE_LEN:
                 for idw, word in enumerate(self.source[idx].split()):
-                    encode(idw, word, self.words_src, self.vec_src)
+                    encode(idx, idw, word, self.words_src, self.vec_src)
                 for idw, word in enumerate(self.dst[idx].split()):
-                    encode(idw, word, self.words_dst, self.vec_dst)
-
+                    encode(idx, idw, word, self.words_dst, self.vec_dst)
+                idx += 1
 
 
     def decode(self, sentence, src=True):
@@ -129,7 +129,8 @@ class CorpusPair:
         return the represented sentence string (tokenized).
         '''
         for word in sentence:
-            print np.nonzero(word)
+            print word
+            #print np.nonzero()
 
 
     def decode_src(self, sentence):
