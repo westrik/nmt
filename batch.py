@@ -33,7 +33,9 @@ class CorpusPair:
         self.build_dicts()
         self.vectorize_corpora()
 
-        self.decode(self.vec_src[0])
+        for line in self.vec_src:
+            print(self.decode_src(line))
+        print(self.decode_dst(self.vec_dst[0]))
 
 
     def shuffle(self):
@@ -102,8 +104,8 @@ class CorpusPair:
                 self.num_sentences += 1
 
         # Initialize numpy matrices to store sentences as vectors
-        self.vec_src = np.zeros(shape=(self.num_sentences,30,VOCAB_SIZE,))
-        self.vec_dst = np.zeros(shape=(self.num_sentences,30,VOCAB_SIZE,))
+        self.vec_src = np.zeros(shape=(self.num_sentences,MAX_SENTENCE_LEN,VOCAB_SIZE,))
+        self.vec_dst = np.zeros(shape=(self.num_sentences,MAX_SENTENCE_LEN,VOCAB_SIZE,))
 
         # Vectorize all sentences of valid length
         def encode(idx, idy, word, word_dict, sen_arr):
@@ -113,12 +115,12 @@ class CorpusPair:
                 sen_arr[idx,idy,0] = 1
 
         idx = 0
-        for line in enumerate(self.source):
-            if words_in_s(self.source[idx]) <= MAX_SENTENCE_LEN \
-                    and words_in_s(self.dst[idx]) <= MAX_SENTENCE_LEN:
-                for idw, word in enumerate(self.source[idx].split()):
+        for idl, line in enumerate(self.source):
+            if words_in_s(self.source[idl]) <= MAX_SENTENCE_LEN \
+                    and words_in_s(self.dst[idl]) <= MAX_SENTENCE_LEN:
+                for idw, word in enumerate(self.source[idl].split()):
                     encode(idx, idw, word, self.words_src, self.vec_src)
-                for idw, word in enumerate(self.dst[idx].split()):
+                for idw, word in enumerate(self.dst[idl].split()):
                     encode(idx, idw, word, self.words_dst, self.vec_dst)
                 idx += 1
 
@@ -128,10 +130,22 @@ class CorpusPair:
         Given an encoded sentence matrix,
         return the represented sentence string (tokenized).
         '''
-        for word in sentence:
-            print word
-            #print np.nonzero()
 
+        words = []
+
+        for word in sentence:
+            idxs = np.nonzero(word)[0]
+            if len(idxs) > 1:
+                raise Exception("Multiple hot bits on word vec")
+            elif len(idxs) == 0:
+                continue
+
+            if src:
+                words.append(self.words_src[0][idxs[0]])
+            else:
+                words.append(self.words_dst[0][idxs[0]])
+
+        return ' '.join(words)
 
     def decode_src(self, sentence):
         return self.decode(sentence)
