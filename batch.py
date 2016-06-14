@@ -5,6 +5,7 @@ Prepare data
 
 import string
 import numpy as np
+import random
 
 MAX_SENTENCE_LEN = 30
 VOCAB_SIZE = 30000
@@ -15,13 +16,9 @@ class CorpusPair:
     occuring VOCAB_SIZE words. Then, batches can be generated.
     '''
 
-    words_src = None
-    words_dst = None
-    source =    None
-    dst =       None
-
-
     def __init__(self, source, dst):
+        self.num_sentences = 0
+
         # open input files, store lines
         try:
             with open(source) as s, open(dst) as t:
@@ -32,11 +29,25 @@ class CorpusPair:
             exit(1)
 
         # then preprocess 
-        self.count_word_usage()
+        self.shuffle()
+        self.build_dicts()
         self.vectorize_corpora()
 
+        print(self.vec_src[0])
 
-    def count_word_usage(self):
+
+    def shuffle(self):
+        '''
+        Prior to training, shuffle training data
+        '''
+        z = list(zip(self.source, self.dst))
+
+        random.shuffle(z)
+
+        self.source, self.dst = zip(*z)
+
+
+    def build_dicts(self):
         '''
         Parse input files, create dictionary of most frequently used 30k words
         '''
@@ -85,15 +96,14 @@ class CorpusPair:
         def words_in_s(s): return len(s.split())
 
         # Count sentences that fit within length limit
-        num_sentences = 0
         for idx,line in enumerate(self.source):
             if words_in_s(self.source[idx]) <= MAX_SENTENCE_LEN \
                     and words_in_s(self.dst[idx]) <= MAX_SENTENCE_LEN:
-                num_sentences += 1
+                self.num_sentences += 1
 
         # Initialize numpy matrices to store sentences as vectors
-        sen_src = np.zeros(shape=(num_sentences,30,VOCAB_SIZE,))
-        sen_dst = np.zeros(shape=(num_sentences,30,VOCAB_SIZE,))
+        self.vec_src = np.zeros(shape=(self.num_sentences,30,VOCAB_SIZE,))
+        self.vec_dst = np.zeros(shape=(self.num_sentences,30,VOCAB_SIZE,))
 
         # Vectorize all sentences of valid length
         def encode(idx, word, word_dict, sen_arr):
@@ -107,14 +117,36 @@ class CorpusPair:
             if words_in_s(self.source[idx]) <= MAX_SENTENCE_LEN \
                     and words_in_s(self.dst[idx]) <= MAX_SENTENCE_LEN:
                 for idw, word in enumerate(self.source[idx].split()):
-                    encode(idw, word, self.words_src, sen_src)
+                    encode(idw, word, self.words_src, self.vec_src)
                 for idw, word in enumerate(self.dst[idx].split()):
-                    encode(idw, word, self.words_dst, sen_dst)
+                    encode(idw, word, self.words_dst, self.vec_dst)
 
 
-    def shuffle_and_split(self):
+
+    def decode(self, sentence, src=True):
+        '''
+        Given an encoded sentence matrix,
+        return the represented sentence string (tokenized).
+        '''
+        for word in sentence:
+            print np.nonzero(word)
+
+
+    def decode_src(self, sentence):
+        return self.decode(sentence)
+
+    def decode_dst(self, sentence):
+        return self.decode(sentence, src=False)
+
+
+
+    def get_minibatches(self):
         '''
         Shuffle, retrieve 1600 sentence pairs
         Sort by length, split into 20 minibatches
         '''
-        pass
+
+        def sentence_len(sentence):
+            pass
+
+        idxs = random.sample(range(0, self.num_sentences), 1600)
