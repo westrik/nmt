@@ -22,6 +22,7 @@ class CorpusPair:
     def __init__(self, source, dst):
 
         # open input files, store lines
+        print "Parse training data"
         try:
             with open(source) as s, open(dst) as t:
                 self.source = s.readlines()
@@ -31,11 +32,12 @@ class CorpusPair:
             exit(1)
 
         # then preprocess 
+        print " ... shuffle"
         self.shuffle()
+        print " ... build lookup maps"
         self.build_dicts()
+        print " ... vectorize data\n"
         self.vectorize_corpora()
-
-        print len( self.get_minibatches())
 
 
     def shuffle(self):
@@ -160,6 +162,7 @@ class CorpusPair:
         Shuffle, retrieve 1600 sentence pairs
         Sort by length, split into 20 minibatches
         '''
+        print "Generating batch at i =",self.current_offset
 
         def sentence_len(sentence):
             length = 0
@@ -179,6 +182,7 @@ class CorpusPair:
             self.current_offset -= self.num_sentences
 
         # Sort by sentence length
+        # TODO Speed this up
         lengths = [sentence_len(sentence) for sentence in src_pairs]
         z = list(zip(lengths, src_pairs, dst_pairs))
         z = sorted(z, key=lambda x: x[0])

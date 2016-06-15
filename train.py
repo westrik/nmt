@@ -22,11 +22,11 @@ def main():
 
     cp = CorpusPair(DEV_SRC, DEV_DST)
 
-    model = RNNEncDecAttnModel()
+    model = RNNEncDecAttnModel(cp)
+
+    cp.get_minibatches()
 
 
-#    for x in cp.shuffle_and_split():
-#        model.train(x)
 
     # dump bidir word dicts 
     with open('wordmap.pkl','w') as wordmap:
