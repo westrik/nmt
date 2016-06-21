@@ -10,6 +10,8 @@ import random
 MAX_SENTENCE_LEN = 30
 VOCAB_SIZE = 30000
 
+np.random.seed(1337)
+
 class CorpusPair:
     '''
     After initialization, contains a dictionary of most frequently 
@@ -182,7 +184,7 @@ class CorpusPair:
             self.current_offset -= self.num_sentences
 
         # Sort by sentence length
-        # TODO Speed this up
+        # TODO Speed up this list comprehension
         lengths = [sentence_len(sentence) for sentence in src_pairs]
         z = list(zip(lengths, src_pairs, dst_pairs))
         z = sorted(z, key=lambda x: x[0])

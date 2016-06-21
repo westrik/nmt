@@ -4,7 +4,7 @@ Train model
 '''
 
 from batch import CorpusPair
-from model import RNNEncDecAttnModel
+from model import RNNEncDecModel
 import pickle as pkl
 
 
@@ -22,7 +22,7 @@ def main():
 
     cp = CorpusPair(DEV_SRC, DEV_DST)
 
-    model = RNNEncDecAttnModel(cp)
+    model = RNNEncDecModel(cp)
 
     cp.get_minibatches()
 

@@ -1,8 +1,9 @@
 # Machine translation with RNNs
 
-Implementation of the language translation model described in "Neural Machine Translation by
-Jointly Learning to Align and Translate" by D. Bahdanau, K. Cho, and Y. Bengio.
-([arXiv](http://arxiv.org/abs/1409.0473))
+Implementation of an LSTM encoder-decoder sequence-to-sequence translation model 
+similar to the one described in "Sequence to Sequence Learning with Neural
+Networks" by I. Sutskever, et al. 2014
+([arXiv](https://arxiv.org/abs/1409.3215))
 
 Implemented in Python using [Theano](https://github.com/Theano/Theano) and
 [Keras](https://github.com/fchollet/keras).
