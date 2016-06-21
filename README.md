@@ -52,8 +52,7 @@ perl tools/normalize-punctuation.perl [en/fr] < data.[en/fr]
 
 RNN (LSTM) encoder-decoder model:
 
-[[https://github.com/westrik/nmt/blob/master/img/diagram.png|alt=Diagram of
-model]]
+![Diagram of model](https://github.com/westrik/nmt/blob/master/img/diagram.png)
 
 <!---
 Insert clear explanation of model along with diagrams 
