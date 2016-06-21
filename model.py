@@ -16,26 +16,41 @@ from keras.layers import Dense, Activation
 
 np.random.seed(1337)
 
+BATCH_SIZE = 30
+NUM_EPOCH = 4
+
 class RNNEncDecModel:
     def __init__(self, cp):
 	print("Building network ...")
-       
-
-	# gated hidden unit with GRU or LSTM
-	model = Sequential()
-
-	model.add(Dense(output_dim=64, input_dim=100))
-	model.add(Activation("relu"))
-	model.add(Dense(output_dim=10))
-	model.add(Activation("softmax"))
-
-	model.compile(loss='categorical_crossentropy', optimizer='sgd', metrics=['accuracy'])
 
 	# First, we build the network, starting with an input layer
 	# Recurrent layers expect input of shape
 	# (batch size, SEQ_LENGTH, num_features)
 
+	# this is the placeholder tensor for the input sequences
+	sequence = Input(shape=(maxlen,), dtype='int32')
+	# this embedding layer will transform the sequences of integers
+	# into vectors of size 128
+	embedded = Embedding(max_features, 128, input_length=maxlen)(sequence)
 
+	# apply forwards LSTM
+	forwards = LSTM(64)(embedded)
+	# apply backwards LSTM
+	backwards = LSTM(64, go_backwards=True)(embedded)
+
+	# concatenate the outputs of the 2 LSTMs
+	merged = merge([forwards, backwards], mode='concat', concat_axis=-1)
+	after_dp = Dropout(0.5)(merged)
+	output = Dense(1, activation='sigmoid')(after_dp)
+
+	self.model = Model(input=sequence, output=output)
+
+	# try using different optimizers and different optimizer configs
+	self.model.compile('adam', 'binary_crossentropy', metrics=['accuracy'])
+
+		
     def train(self):
-        pass
-
+	self.model.fit(self.X_train, self.y_train,
+	      batch_size=BATCH_SIZE,
+	      nb_epoch=NUM_EPOCH,
+	      validation_data=[self.X_test, self.y_test])
