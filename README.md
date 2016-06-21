@@ -50,8 +50,11 @@ perl tools/normalize-punctuation.perl [en/fr] < data.[en/fr]
 
 ## Model
 
-RNN encoder-decoder with soft attention mechanism.
-[...]
+RNN (LSTM) encoder-decoder model:
+
+[[https://github.com/westrik/nmt/blob/master/img/diagram.png|alt=Diagram of
+model]]
+
 <!---
 Insert clear explanation of model along with diagrams 
 -->
