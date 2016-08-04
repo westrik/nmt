@@ -13,17 +13,13 @@ Implemented in Python using [Theano](https://github.com/Theano/Theano) and
 ## Usage
 
 ###Translation
-[...]
-
-####Using precomputed weights
-[...]
-
+```
+python translate.py weights.pkl "Text to translate"
+```
 
 ###Training
-[...]
 
-
-####Data preparation
+###Data preparation
 
 While developing this model, I used the development data sets (news-test2012 and
 news-test2013) from the [WMT14 shared task](http://www.statmt.org/wmt14/translation-task.html). 
@@ -42,8 +38,6 @@ perl tools/normalize-punctuation.perl [en/fr] < data.[en/fr]
     > data.tok.[en/fr]
 ```
 
-####Train the model
-[...]
 
 
 <!--- ////////////////// -->
